@@ -117,7 +117,21 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
+  s.xcconfig			= { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/GDataXML-HTML/libxml" }
   # s.dependency "JSONKit", "~> 1.4"
+
+  # Make it accessible within a framework
+  s.module_map			= 'libxml/libxml.modulemap'
+  s.prepare_command		= <<-CMD
+        mkdir libxml
+        touch libxml/libxml.modulemap
+        cat > "libxml/libxml.modulemap" << MAP
+module libxml [system] {
+    header "/usr/include/libxml2/libxml/tree.h"
+    link "libxml"
+    export *
+}
+MAP
+  CMD
 
 end
